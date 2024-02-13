@@ -3,6 +3,7 @@ import WorkspaceList from "../../workspace/WorkspaceList.js"
 import WorkspaceColor from "../../workspace/WorkspaceColor.js"
 import sortable from "../../lib/sortable.js"
 import Options from "../../storage/Options.js"
+import { windowState } from "../../util/utils.js"
 
 const selectedClass = "item-selected"
 
@@ -52,6 +53,17 @@ class ListView extends View {
         itemName.classList.add("item-name")
         itemName.innerText = name
 
+        const itemIndicator = document.createElement("div")
+        WorkspaceList.findWindowForWorkspace(id).then((windowId) => {
+            windowState(windowId).then((state) => {
+                if (state === 'normal' || state === 'maximized' || state == 'fullscreen') {
+                    itemIndicator.classList.add("led-green")
+                } else if (state === 'minimized' || state == 'docked') {
+                    itemIndicator.classList.add("led-yellow")
+                }
+            })
+        })
+
         const itemButton = document.createElement("i")
         itemButton.title = "Edit"
         itemButton.classList.add("bi", "bi-three-dots", "item-edit-button")
@@ -68,6 +80,7 @@ class ListView extends View {
         item.style.setProperty('--item-bg-color', WorkspaceColor[color] + "24")
         item.appendChild(itemColor)
         item.appendChild(itemName)
+        item.appendChild(itemIndicator)
         item.appendChild(itemButton)
 
         if (name.length > 40) {
@@ -92,8 +105,8 @@ class ListView extends View {
 }
 
 /**
- * @param {import("../../workspace/Workspace.js").Workspace[]} workspaces 
- * @param {import("../../storage/Options.js").OptionsData["sorting"]} sorting 
+ * @param {import("../../workspace/Workspace.js").Workspace[]} workspaces
+ * @param {import("../../storage/Options.js").OptionsData["sorting"]} sorting
  */
 function sortWorkspaces(workspaces, sorting) {
     if (sorting === "name") {

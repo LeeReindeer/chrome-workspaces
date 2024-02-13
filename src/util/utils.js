@@ -22,3 +22,15 @@ export async function windowExists(windowId) {
 		return false
 	}
 }
+
+
+/**
+ *
+ * @param {number} windowId
+ * @returns {Promise<string>}
+ */
+export function windowState(windowId) {
+	return chrome.windows.get(windowId).then((win) => {
+		return win.state
+	})
+}
